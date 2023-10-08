@@ -1,4 +1,4 @@
-# Air Quality Monitoring System
+# A Raspberry Pi-based Air Quality Monitor Project
 
 An air quality sensor device software project utilizing An air quality sensor device software project utilizing i2c sensors and other peripherals with Raspberry Pi Zero W. This repository contains drivers for various sensors used in an air quality monitoring system. Currently, it includes the driver for the CM1107 CO2 sensor.
 
