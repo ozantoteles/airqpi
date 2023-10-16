@@ -1,0 +1,12 @@
+[Unit]
+Description=Air Quality Monitor Service
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/python3.9 /usr/local/airqpi/main.py
+WorkingDirectory=/usr/local/airqpi
+User=pi
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
