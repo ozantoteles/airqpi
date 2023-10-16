@@ -6,3 +6,6 @@ arduino_iot_cloud/__pycache__/
 cbor2/__pycache__/
 senml/__pycache__/
 secrets.py
+drivers/buffer/
+buffer/
+
