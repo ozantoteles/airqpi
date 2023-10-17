@@ -4,6 +4,8 @@ from sensorUtils import SensorHandler
 from batteryUtils import BatteryHandler
 import logging
 import asyncio
+import psutil
+import socket
 
 sensor = SensorHandler()
 sensor.init_sensors()
@@ -13,20 +15,15 @@ charger = BatteryHandler()
 charger.init_ic()
 charger_buffer = {}
 
-def configure_logger():
-    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    return logging.getLogger(__name__)
-
-logger = configure_logger()
-
 def update_sensor_values(client):
     global sensor_buffer
     try:
         sensor_data = sensor.handler()
+        logging.debug(f'sensor_data: {sensor_data}')
         sensor_buffer = sensor_data  # Update the buffer with the latest sensor values
     except Exception as e:
         # Log any exceptions
-        logger.error(f'An error occurred when updating sensor values: {e}')
+        logging.error(f'An error occurred when updating sensor values to buffer {sensor_buffer}: {e}')
 
 def read_sensor_value(client, value_name):
     try:
@@ -36,7 +33,7 @@ def read_sensor_value(client, value_name):
         else:
             return 0  # Default value if key not found
     except Exception as e:
-        logger.error(f'An error occurred: {e}')
+        logging.error(f'An error occurred: {e}')
         
 def update_charger_values(client):
     global charger_buffer
@@ -45,7 +42,7 @@ def update_charger_values(client):
         charger_buffer = charger_data  # Update the buffer with the latest sensor values
     except Exception as e:
         # Log any exceptions
-        logger.error(f'An error occurred when updating charger values: {e}')
+        logging.error(f'An error occurred when updating charger values: {e}')
 
 def read_charger_value(client, value_name):
     try:
@@ -55,9 +52,26 @@ def read_charger_value(client, value_name):
         else:
             return 0  # Default value if key not found
     except Exception as e:
-        logger.error(f'An error occurred: {e}')
+        logging.error(f'An error occurred: {e}')
+        
+def get_network_info(client):
+    try:
+        network_info = ""
+        for interface, addrs in psutil.net_if_addrs().items():
+            for addr in addrs:
+                if addr.family == socket.AF_INET:
+                    network_info += f"Interface: {interface}\n"
+                    network_info += f"  Address: {addr.address}\n"
+                    network_info += f"  Netmask: {addr.netmask}\n"
+                    network_info += f"  Broadcast: {addr.broadcast}\n\n"
+        return network_info.strip()
+    except Exception as e:
+        return str(e)
     
 def main():
+
+    logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    logging.info("Starting AirQPi Application")
     
     client = ArduinoCloudClient(device_id=DEVICE_ID, username=DEVICE_ID, password=SECRET_KEY)
     
@@ -88,6 +102,9 @@ def main():
     
     for value_name in int_charger_value_names:
         client.register(value_name.lower(), value=None, on_read=lambda client, value_name=value_name: read_charger_value(client, value_name), interval=10.0)
+        
+    client.register("network_info", value="", on_read=get_network_info, interval=1800.0)
+
       
     
     client.start()

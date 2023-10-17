@@ -78,7 +78,7 @@ def read(bus):
     delay_sec(0xFFFF)
     #read sensor values, page:18
     data=bus.read_i2c_block_data(PM2008,0x00,32)
-    bus.close()
+    #bus.close()
     #print(data)
     #print("PM2008 Status Byte: ",data[2])
     #print("PM1.0 GRIMM:",256*data[7]+data[8])
@@ -97,20 +97,8 @@ def read(bus):
 
     # Check status byte and return -999 if not measuring
     if data[2] != 2:
-        pm2008SensorVals = {
-            "PM2008_1_0_GRIMM_LEVEL": -999,
-            "PM2008_2_5_GRIMM_LEVEL": -999,
-            "PM2008_10_GRIMM_LEVEL": -999,
-            "PM2008_1_0_TSI_LEVEL": -999,
-            "PM2008_2_5_TSI_LEVEL": -999,
-            "PM2008_10_TSI_LEVEL": -999,
-            "PM2008_0_3_L_LEVEL": -999,
-            "PM2008_0_5_L_LEVEL": -999,
-            "PM2008_1_0_L_LEVEL": -999,
-            "PM2008_2_5_L_LEVEL": -999,
-            "PM2008_5_L_LEVEL": -999,
-            "PM2008_10_L_LEVEL": -999
-        }
+        logging.error("Error: Sensor error detected")
+        return None
     else:
         pm2008SensorVals = {}
         pm2008SensorVals["PM2008_1_0_GRIMM_LEVEL"] = 256*data[7]+data[8]
@@ -131,18 +119,17 @@ def read(bus):
 
 def main():
 
-    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    logger = logging.getLogger(__name__)
+    logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
     try:
         bus = init(1)
         pmVals = read(bus)
         
-        logger.info(f'PM measurement: {pmVals}')
+        logging.info(f'PM measurement: {pmVals}')
         
     except Exception as e:
         # Log any exceptions
-        logger.error(f'An error occurred: {e}')
+        logging.error(f'An error occurred: {e}')
 
     return 0
 

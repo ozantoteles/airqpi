@@ -8,4 +8,6 @@ senml/__pycache__/
 secrets.py
 drivers/buffer/
 buffer/
+*.log
+logs/
 

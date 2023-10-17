@@ -15,12 +15,6 @@ SGP4X_BUS = '/dev/i2c-1'
 
 #private functions
 
-def configure_logger():
-    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    return logging.getLogger(__name__)
-
-logger = configure_logger()
-
 def init(busNo, bufferFolder='buffer'):
     
     i2c_transceiver = LinuxI2cTransceiver(busNo)
@@ -34,12 +28,12 @@ def init(busNo, bufferFolder='buffer'):
 
 def read(sensor, temperature=25.0, humidity=50.0, bufferFolder='buffer/', bufferSize=5000, bufferFile='vochistory.csv'):
     
-    logger.debug(f'temperature: {temperature}')
-    logger.debug(f'humidity: {humidity}')
+    ##logging.debug(f'temperature: {temperature}')
+    ##logging.debug(f'humidity: {humidity}')
     
     sraw_voc = sensor.measure_raw(temperature, humidity)
-    logger.debug(f'sraw_voc: {sraw_voc}')
-    logger.debug(f'sraw_voc ticks: {sraw_voc.ticks}')
+    ##logging.debug(f'sraw_voc: {sraw_voc}')
+    ##logging.debug(f'sraw_voc ticks: {sraw_voc.ticks}')
     
     sgp4x_data = {}
     sgp4x_data["SGP40_SRAW_VOC"] = sraw_voc.ticks
@@ -77,10 +71,7 @@ def read(sensor, temperature=25.0, humidity=50.0, bufferFolder='buffer/', buffer
 
 def main():
 
-    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    logger = logging.getLogger(__name__)
-    
-    logging.getLogger().setLevel(logging.DEBUG)
+    logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
     try:
         sgp40 = init(SGP4X_BUS)
@@ -88,13 +79,13 @@ def main():
         
         # Log the temp, hum, hcho values, and device marking
         
-        logger.info(f'SHT40 SRAW VOC: {sgp40_data["SGP40_SRAW_VOC"]}')
-        logger.info(f'SGP40 VOC INDEX: {sgp40_data["SGP40_VOC_INDEX"]}')
+        logging.info(f'SHT40 SRAW VOC: {sgp40_data["SGP40_SRAW_VOC"]}')
+        logging.info(f'SGP40 VOC INDEX: {sgp40_data["SGP40_VOC_INDEX"]}')
         
     
     except Exception as e:
         # Log any exceptions
-        logger.error(f'An error occurred: {e}')
+        logging.error(f'An error occurred: {e}')
 
     return 0
 

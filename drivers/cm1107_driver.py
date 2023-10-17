@@ -107,6 +107,8 @@ def read(bus):
     
     # Read data from the sensor
     data = bus.read_i2c_block_data(CM1107, read_cmd, 5)
+    
+    logging.debug(f'cm1104 read data: {data}')
 
     # print("data: ", data)
 
@@ -130,17 +132,17 @@ def read(bus):
 
     # Extract CO2 measuring result from data
     if bit1 == 1:
-        print("Error: Sensor error detected")
-        return -999
+        logging.error("Error: Sensor error detected")
+        return None
     elif bit2 == 1:
-        print("Error: Measurement range over range")
+        logging.error("Error: Measurement range over range")
         return data_upper_limit
     elif bit3 == 1:
-        print("Error: Measurement range less than range")
+        logging.error("Error: Measurement range less than range")
         return data_lower_limit
     else:
         co2 = (data[1] << 8) + data[2]
-        # print("co2: ", co2)
+        logging.debug(f'co2:  {co2}')
         return co2 
 
     # Print the status bits (optional)
@@ -241,8 +243,7 @@ def get_software_version(bus):
 
 def main():
 
-    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    logger = logging.getLogger(__name__)
+    logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
     try:
         bus = init(1)
@@ -251,13 +252,13 @@ def main():
         software_version = get_software_version(bus)
         
         # Log the CO2 value, serial number and sensor software version
-        logger.info(f'CO2 measurement: {co2} ppm')
-        logger.info(f'Serial Number: {serial_number}')
-        logger.info(f'Software Version: {software_version}')
+        logging.info(f'CO2 measurement: {co2} ppm')
+        logging.info(f'Serial Number: {serial_number}')
+        logging.info(f'Software Version: {software_version}')
     
     except Exception as e:
         # Log any exceptions
-        logger.error(f'An error occurred: {e}')
+        logging.error(f'An error occurred: {e}')
 
     return 0
 

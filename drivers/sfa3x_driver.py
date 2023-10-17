@@ -11,14 +11,6 @@ data_lower_limit = 0
 HCHO = 0x5D
 HCHO_BUS = 1 #default
 
-#private functions
-
-def configure_logger():
-    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    return logging.getLogger(__name__)
-
-logger = configure_logger()
-        
 def calcHcho(hcho):
     # calculate temperature in degrees celcius, page: 14
     return (hcho/5.0)        
@@ -35,7 +27,7 @@ def sensor_reset(bus):
     
     bus.write_byte_data(HCHO,0xD3, 0x04)
     time.sleep(0.5)
-    logger.debug(f'Sensor reset performed')
+    logging.debug(f'Sensor reset performed')
 
 def crc_value(data_tobe_sent):
     #calculate crc value for two bytes to be send, page 12
@@ -70,7 +62,7 @@ def get_sensor_device_marking(bus):
             if calculated_checksum == checksum and byte1 != 0 and byte2 != 0:
                 device_marking += chr(byte1) + chr(byte2)
                 
-    logger.debug(f'SFA3x HCHO: {device_marking}')
+    logging.debug(f'SFA3x HCHO: {device_marking}')
     
     return(device_marking)
 
@@ -98,7 +90,7 @@ def read(bus):
     
     rawdata = measure_raw(bus)
     time.sleep(0.5)
-    logger.debug(f'Raw data {rawdata}')
+    logging.debug(f'sfa3x Raw data {rawdata}')
     SFA30temp = calcTemp(256*rawdata[6]+rawdata[7])
     SFA30hum = calcHum(256*rawdata[3]+rawdata[4])
     SFA30hcho = calcHcho(256*rawdata[0]+rawdata[1])
@@ -107,10 +99,7 @@ def read(bus):
 
 def main():
 
-    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    logger = logging.getLogger(__name__)
-    
-    logging.getLogger().setLevel(logging.DEBUG)
+    logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
     try:
         bus = init(1)
@@ -118,14 +107,14 @@ def main():
         
         # Log the temp, hum, hcho values, and device marking
         
-        logger.info(f'SFA3x Temperature: {temp} C')
-        logger.info(f'SFA3x Relative Humidity: {hum} %')
-        logger.info(f'SFA3x HCHO: {hcho} ppb')
+        logging.info(f'SFA3x Temperature: {temp} C')
+        logging.info(f'SFA3x Relative Humidity: {hum} %')
+        logging.info(f'SFA3x HCHO: {hcho} ppb')
         
     
     except Exception as e:
         # Log any exceptions
-        logger.error(f'An error occurred: {e}')
+        logging.error(f'An error occurred: {e}')
 
     return 0
 

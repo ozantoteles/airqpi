@@ -13,14 +13,6 @@ hum_data_lower_limit = 0
 SHT40 = 0x45
 SHT40_BUS = '/dev/i2c-1'
 
-#private functions
-
-def configure_logger():
-    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    return logging.getLogger(__name__)
-
-logger = configure_logger()
-
 def init(busNo):
     
     i2c_transceiver = LinuxI2cTransceiver(busNo)
@@ -32,13 +24,13 @@ def init(busNo):
 def read(sensor):
     
     temperature, humidity = sensor.single_shot_measurement()
-    logger.debug(f'Temperature: {temperature}, humidity: {humidity}')
+    logging.debug(f'Temperature: {temperature}, humidity: {humidity}')
     
-    logger.debug(f'SHT40 Temperature ticks: {temperature.ticks}')
-    logger.debug(f'SHT40 Temperature celcius: {temperature.degrees_celsius}')
-    logger.debug(f'SHT40 Temperature fahrenheit: {temperature.degrees_fahrenheit}')
-    logger.debug(f'SHT40 Relative Humidity ticks: {humidity.ticks}')
-    logger.debug(f'SHT40 Relative Humidity %RH: {humidity.percent_rh}')
+    logging.debug(f'SHT40 Temperature ticks: {temperature.ticks}')
+    logging.debug(f'SHT40 Temperature celcius: {temperature.degrees_celsius}')
+    logging.debug(f'SHT40 Temperature fahrenheit: {temperature.degrees_fahrenheit}')
+    logging.debug(f'SHT40 Relative Humidity ticks: {humidity.ticks}')
+    logging.debug(f'SHT40 Relative Humidity %RH: {humidity.percent_rh}')
     
     sht4x_data = {}
     sht4x_data["SHT40_TEMP"] = temperature.degrees_celsius
@@ -49,7 +41,7 @@ def read(sensor):
 def main():
 
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    logger = logging.getLogger(__name__)
+    logging = logging.getLogger(__name__)
     
     logging.getLogger().setLevel(logging.DEBUG)
 
@@ -59,13 +51,13 @@ def main():
         
         # Log the temp, hum, hcho values, and device marking
         
-        logger.info(f'SHT40 Temperature: {sht40_data["SHT40_TEMP"]}')
-        logger.info(f'SHT40 Relative Humidity: {sht40_data["SHT40_HUM"]}')
+        logging.info(f'SHT40 Temperature: {sht40_data["SHT40_TEMP"]}')
+        logging.info(f'SHT40 Relative Humidity: {sht40_data["SHT40_HUM"]}')
         
     
     except Exception as e:
         # Log any exceptions
-        logger.error(f'An error occurred: {e}')
+        logging.error(f'An error occurred: {e}')
 
     return 0
 
