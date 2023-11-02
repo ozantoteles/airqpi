@@ -104,8 +104,6 @@ def main():
         client.register(value_name.lower(), value=None, on_read=lambda client, value_name=value_name: read_charger_value(client, value_name), interval=10.0)
         
     client.register("network_info", value="", on_read=get_network_info, interval=1800.0)
-
-      
     
     client.start()
 
